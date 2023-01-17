@@ -66,7 +66,7 @@ class CliRunner extends CommandRunner<void> {
       exit(1);
     }
 
-    await _checkForUpdates();
+    // await _checkForUpdates();
 
     exit(0);
   }

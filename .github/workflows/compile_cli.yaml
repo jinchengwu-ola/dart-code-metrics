@@ -7,17 +7,19 @@ on:
 
 jobs:
   pack:
-    runs-on: macos-latest
+    runs-on: [self-hosted, macOS]
     steps:
-      - uses: actions/checkout@v2
-      - uses: dart-lang/setup-dart@v1
+      - uses: actions/checkout@v4
+      - uses: olaparty/flutter-action@main
         with:
-          sdk: stable
+          flutter-repo: "git@github.com:olachat/flutter.git"
+          channel: "flutter-3.13.9"
+          cache: false
       - name: Install dependencies
         run: dart pub get
       - name: Compile jit snapshot
         run: dart compile jit-snapshot bin/metrics_cli.dart
       - uses: actions/upload-artifact@v2.3.1
-        with: 
+        with:
           name: metrics
-          path: bin/metrics_cli.jit         
+          path: bin/metrics_cli.jit

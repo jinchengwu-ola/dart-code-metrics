@@ -6,6 +6,8 @@ import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer_plugin/plugin/plugin.dart';
 import 'package:analyzer_plugin/protocol/protocol_generated.dart' as plugin;
+import 'package:http/http.dart';
+import 'package:uuid/uuid.dart';
 
 import '../analyzers/lint_analyzer/lint_analysis_config.dart';
 import '../analyzers/lint_analyzer/lint_analysis_options_validator.dart';
@@ -32,14 +34,36 @@ class AnalyzerPlugin extends ServerPlugin {
   List<String> get fileGlobsToAnalyze => const ['*.dart', '*.yaml'];
 
   @override
-  String get name => 'Dart Code Metrics $packageVersion';
+  String get name => 'DCM $packageVersion';
 
   @override
   String get version => '1.0.0-alpha.0';
 
   AnalyzerPlugin({
     required super.resourceProvider,
-  });
+  }) {
+    final location =
+        resourceProvider.getStateLocation('.dart-code-metrics-uuid');
+    if (location == null) {
+      return;
+    }
+
+    var uuid = '';
+
+    final file = location.getChildAssumingFile('uuid');
+    if (!file.exists) {
+      uuid = const Uuid().v4();
+      file
+        ..createSource(file.toUri())
+        ..writeAsStringSync(uuid);
+    } else {
+      uuid = file.readAsStringSync();
+    }
+
+    final uri = Uri.parse('https://dcm.dev/api/analytics/usage');
+
+    post(uri, body: {'uuid': uuid, 'version': packageVersion}).ignore();
+  }
 
   @override
   Future<void> afterNewContextCollection({

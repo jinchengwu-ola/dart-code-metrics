@@ -8,15 +8,20 @@ class _Visitor extends RecursiveAstVisitor<void> {
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
     final parent = node.parent;
+    // ignore: deprecated_member_use
     if (parent is NamedType && (parent.type?.isDynamic ?? false)) {
       final grandParent = node.parent?.parent;
-      if (grandParent != null) {
-        final grandGrandParent = grandParent.parent;
-        if (!(grandGrandParent is NamedType &&
-            (grandGrandParent.type?.isDartCoreMap ?? false))) {
-          _nodes.add(grandParent);
-        }
+      if (grandParent != null && !_isWithinMap(grandParent)) {
+        _nodes.add(grandParent);
       }
     }
+  }
+
+  bool _isWithinMap(AstNode grandParent) {
+    final grandGrandParent = grandParent.parent;
+
+    return grandGrandParent is NamedType &&
+            (grandGrandParent.type?.isDartCoreMap ?? false) ||
+        grandGrandParent is SetOrMapLiteral && grandGrandParent.isMap;
   }
 }

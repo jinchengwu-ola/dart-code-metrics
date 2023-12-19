@@ -2,14 +2,20 @@ part of 'use_setstate_synchronously_rule.dart';
 
 class _Visitor extends RecursiveAstVisitor<void> {
   final Set<String> methods;
+
   _Visitor({required this.methods});
 
   final nodes = <SimpleIdentifier>[];
 
   @override
-  void visitClassDeclaration(ClassDeclaration node) {
-    if (isWidgetStateOrSubclass(node.extendsClause?.superclass.type)) {
-      node.visitChildren(this);
+  void visitCompilationUnit(CompilationUnit node) {
+    for (final declaration in node.declarations) {
+      if (declaration is ClassDeclaration) {
+        final type = declaration.extendsClause?.superclass.type;
+        if (isWidgetStateOrSubclass(type)) {
+          declaration.visitChildren(this);
+        }
+      }
     }
   }
 
@@ -44,6 +50,13 @@ class _AsyncSetStateVisitor extends RecursiveAstVisitor<void> {
   }
 
   @override
+  void visitAssertStatement(AssertStatement node) {
+    final newMounted = _extractMountedCheck(node.condition);
+    mounted = newMounted.or(mounted);
+    super.visitAssertStatement(node);
+  }
+
+  @override
   void visitMethodInvocation(MethodInvocation node) {
     if (!inAsync) {
       return node.visitChildren(this);
@@ -65,7 +78,10 @@ class _AsyncSetStateVisitor extends RecursiveAstVisitor<void> {
       return node.visitChildren(this);
     }
 
-    node.condition.visitChildren(this);
+    // ignore: deprecated_member_use
+    node.condition.accept(this);
+
+    // ignore: deprecated_member_use
     final newMounted = _extractMountedCheck(node.condition);
     mounted = newMounted.or(mounted);
 
@@ -89,6 +105,7 @@ class _AsyncSetStateVisitor extends RecursiveAstVisitor<void> {
     } else if (elseDiverges) {
       mounted = beforeThen != afterThen
           ? afterThen
+          // ignore: deprecated_member_use
           : _extractMountedCheck(node.condition, permitAnd: false);
     }
   }
@@ -99,7 +116,7 @@ class _AsyncSetStateVisitor extends RecursiveAstVisitor<void> {
       return node.visitChildren(this);
     }
 
-    node.condition.visitChildren(this);
+    node.condition.accept(this);
 
     final oldMounted = mounted;
     final newMounted = _extractMountedCheck(node.condition);
@@ -121,7 +138,7 @@ class _AsyncSetStateVisitor extends RecursiveAstVisitor<void> {
       return node.visitChildren(this);
     }
 
-    node.forLoopParts.visitChildren(this);
+    node.forLoopParts.accept(this);
 
     final oldInControlFlow = inControlFlow;
     inControlFlow = true;
@@ -153,9 +170,8 @@ class _AsyncSetStateVisitor extends RecursiveAstVisitor<void> {
     final oldMounted = mounted;
     node.body.visitChildren(this);
     final afterBody = mounted;
-    // ignore: omit_local_variable_types
-    final MountedFact beforeCatch =
-        mounted == oldMounted ? oldMounted : false.asFact();
+    final beforeCatch =
+        mounted == oldMounted ? oldMounted : false.asFact<BinaryExpression>();
     for (final clause in node.catchClauses) {
       mounted = beforeCatch;
       clause.visitChildren(this);
@@ -176,7 +192,7 @@ class _AsyncSetStateVisitor extends RecursiveAstVisitor<void> {
       return node.visitChildren(this);
     }
 
-    node.expression.visitChildren(this);
+    node.expression.accept(this);
 
     final oldInControlFlow = inControlFlow;
     inControlFlow = true;

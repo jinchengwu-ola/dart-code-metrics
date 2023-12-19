@@ -95,7 +95,49 @@ class _FooState extends State<StatefulWidget> {
       await fetch();
     }
     setState(() {}); // LINT
+
+    if (!mounted) return;
+
+    if (await condition()) {
+      setState(() {}); // LINT
+    }
   }
 }
 
 class State {}
+
+Future<void> fetch() {}
+
+Future<bool> condition() {}
+
+class SomeClass {
+  void setState(Function() callback) {}
+}
+
+Future<void> handle(Future Function() callback) {}
+
+mixin _SomeMixin on SomeClass {
+  Future<bool> condition() => handle(() async {
+        await fetch();
+
+        setState();
+      });
+}
+
+abstract class IController {
+  void setState(void Function() fn);
+}
+
+abstract class ControllerBase implements IController {
+  @override
+  void setState(void Function() fn) {}
+}
+
+class ControllerImpl = ControllerBase with ControllerMixin;
+
+mixin ControllerMixin on ControllerBase {
+  Future<void> helloWorld() async {
+    await Future<void>.delayed(const Duration(seconds: 1));
+    setState(() {});
+  }
+}

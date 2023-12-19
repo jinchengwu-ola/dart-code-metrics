@@ -13,7 +13,8 @@ void main() {
 
   withMethods
     ..someMethod(null)
-    ..someMethod('value');
+    ..someMethod('value')
+    ..tearOff('str');
 
   withMethods.alwaysNonNullable('anotherValue');
   withMethods.ignoredAlwaysNonNullable('anotherValue');
@@ -44,6 +45,9 @@ void main() {
   multipleParametersWithOptional('name', 1, 'secondName');
 
   MyWidget(GlobalKey());
+
+  AnotherWidget(onSubmit: withMethods.tearOff);
+  AnotherWidget(onSubmit: withMethods.inner.anotherTearOff);
 }
 
 class _Test {

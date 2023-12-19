@@ -5,6 +5,7 @@ import 'rules_list/avoid_banned_imports/avoid_banned_imports_rule.dart';
 import 'rules_list/avoid_border_all/avoid_border_all_rule.dart';
 import 'rules_list/avoid_cascade_after_if_null/avoid_cascade_after_if_null_rule.dart';
 import 'rules_list/avoid_collection_methods_with_unrelated_types/avoid_collection_methods_with_unrelated_types_rule.dart';
+import 'rules_list/avoid_creating_vector_in_update/avoid_creating_vector_in_update_rule.dart';
 import 'rules_list/avoid_double_slash_imports/avoid_double_slash_imports_rule.dart';
 import 'rules_list/avoid_duplicate_exports/avoid_duplicate_exports_rule.dart';
 import 'rules_list/avoid_dynamic/avoid_dynamic_rule.dart';
@@ -12,6 +13,7 @@ import 'rules_list/avoid_edgesinset_only/avoid_edgeinsets_only_rule.dart';
 import 'rules_list/avoid_expanded_as_spacer/avoid_expanded_as_spacer_rule.dart';
 import 'rules_list/avoid_global_state/avoid_global_state_rule.dart';
 import 'rules_list/avoid_ignoring_return_values/avoid_ignoring_return_values_rule.dart';
+import 'rules_list/avoid_initializing_in_on_mount/avoid_initializing_in_on_mount_rule.dart';
 import 'rules_list/avoid_late_keyword/avoid_late_keyword_rule.dart';
 import 'rules_list/avoid_literal_string_in_text_widget/avoid_literal_string_in_text_widget_rule.dart';
 import 'rules_list/avoid_missing_enum_constant_in_map/avoid_missing_enum_constant_in_map_rule.dart';
@@ -21,8 +23,10 @@ import 'rules_list/avoid_non_null_assertion/avoid_non_null_assertion_rule.dart';
 import 'rules_list/avoid_passing_async_when_sync_expected/avoid_passing_async_when_sync_expected_rule.dart';
 import 'rules_list/avoid_preserve_whitespace_false/avoid_preserve_whitespace_false_rule.dart';
 import 'rules_list/avoid_redundant_async/avoid_redundant_async_rule.dart';
+import 'rules_list/avoid_redundant_async_on_load/avoid_redundant_async_on_load_rule.dart';
 import 'rules_list/avoid_returning_widgets/avoid_returning_widgets_rule.dart';
 import 'rules_list/avoid_shrink_wrap_in_lists/avoid_shrink_wrap_in_lists_rule.dart';
+import 'rules_list/avoid_substring/avoid_substring_rule.dart';
 import 'rules_list/avoid_throw_in_catch_block/avoid_throw_in_catch_block_rule.dart';
 import 'rules_list/avoid_top_level_members_in_tests/avoid_top_level_members_in_tests_rule.dart';
 import 'rules_list/avoid_unnecessary_conditionals/avoid_unnecessary_conditionals_rule.dart';
@@ -38,6 +42,7 @@ import 'rules_list/check_for_equals_in_render_object_setters/check_for_equals_in
 import 'rules_list/check_post_frame_callback/check_post_frame_callback_rule.dart';
 import 'rules_list/component_annotation_arguments_ordering/component_annotation_arguments_ordering_rule.dart';
 import 'rules_list/consistent_update_render_object/consistent_update_render_object_rule.dart';
+import 'rules_list/correct_game_instantiating/correct_game_instantiating_rule.dart';
 import 'rules_list/double_literal_format/double_literal_format_rule.dart';
 import 'rules_list/format_comment/format_comment_rule.dart';
 import 'rules_list/list_all_equatable_fields/list_all_equatable_fields_rule.dart';
@@ -58,6 +63,7 @@ import 'rules_list/prefer_correct_edge_insets_constructor/prefer_correct_edge_in
 import 'rules_list/prefer_correct_identifier_length/prefer_correct_identifier_length_rule.dart';
 import 'rules_list/prefer_correct_test_file_name/prefer_correct_test_file_name_rule.dart';
 import 'rules_list/prefer_correct_type_name/prefer_correct_type_name_rule.dart';
+import 'rules_list/prefer_define_hero_tag/prefer_define_hero_tag_rule.dart';
 import 'rules_list/prefer_enums_by_name/prefer_enums_by_name_rule.dart';
 import 'rules_list/prefer_extracting_callbacks/prefer_extracting_callbacks_rule.dart';
 import 'rules_list/prefer_first/prefer_first_rule.dart';
@@ -85,11 +91,13 @@ final _implementedRules = <String, Rule Function(Map<String, Object>)>{
   AvoidBorderAllRule.ruleId: AvoidBorderAllRule.new,
   AvoidCascadeAfterIfNullRule.ruleId: AvoidCascadeAfterIfNullRule.new,
   AvoidCollectionMethodsWithUnrelatedTypesRule.ruleId: AvoidCollectionMethodsWithUnrelatedTypesRule.new,
+  AvoidCreatingVectorInUpdateRule.ruleId: AvoidCreatingVectorInUpdateRule.new,
   AvoidDoubleSlashImportsRule.ruleId: AvoidDoubleSlashImportsRule.new,
   AvoidDuplicateExportsRule.ruleId: AvoidDuplicateExportsRule.new,
   AvoidDynamicRule.ruleId: AvoidDynamicRule.new,
   AvoidGlobalStateRule.ruleId: AvoidGlobalStateRule.new,
   AvoidIgnoringReturnValuesRule.ruleId: AvoidIgnoringReturnValuesRule.new,
+  AvoidInitializingInOnMountRule.ruleId: AvoidInitializingInOnMountRule.new,
   AvoidLateKeywordRule.ruleId: AvoidLateKeywordRule.new,
   AvoidMissingEnumConstantInMapRule.ruleId: AvoidMissingEnumConstantInMapRule.new,
   AvoidNestedConditionalExpressionsRule.ruleId: AvoidNestedConditionalExpressionsRule.new,
@@ -98,8 +106,10 @@ final _implementedRules = <String, Rule Function(Map<String, Object>)>{
   AvoidPassingAsyncWhenSyncExpectedRule.ruleId: AvoidPassingAsyncWhenSyncExpectedRule.new,
   AvoidPreserveWhitespaceFalseRule.ruleId: AvoidPreserveWhitespaceFalseRule.new,
   AvoidRedundantAsyncRule.ruleId: AvoidRedundantAsyncRule.new,
+  AvoidRedundantAsyncOnLoadRule.ruleId: AvoidRedundantAsyncOnLoadRule.new,
   AvoidReturningWidgetsRule.ruleId: AvoidReturningWidgetsRule.new,
   AvoidShrinkWrapInListsRule.ruleId: AvoidShrinkWrapInListsRule.new,
+  AvoidSubstringRule.ruleId: AvoidSubstringRule.new,
   AvoidThrowInCatchBlockRule.ruleId: AvoidThrowInCatchBlockRule.new,
   AvoidTopLevelMembersInTestsRule.ruleId: AvoidTopLevelMembersInTestsRule.new,
   AvoidUnnecessaryConditionalsRule.ruleId: AvoidUnnecessaryConditionalsRule.new,
@@ -116,6 +126,7 @@ final _implementedRules = <String, Rule Function(Map<String, Object>)>{
   CheckForEqualsInRenderObjectSettersRule.ruleId: CheckForEqualsInRenderObjectSettersRule.new,
   ComponentAnnotationArgumentsOrderingRule.ruleId: ComponentAnnotationArgumentsOrderingRule.new,
   ConsistentUpdateRenderObjectRule.ruleId: ConsistentUpdateRenderObjectRule.new,
+  CorrectGameInstantiatingRule.ruleId: CorrectGameInstantiatingRule.new,
   DoubleLiteralFormatRule.ruleId: DoubleLiteralFormatRule.new,
   FormatCommentRule.ruleId: FormatCommentRule.new,
   ListAllEquatableFieldsRule.ruleId: ListAllEquatableFieldsRule.new,
@@ -136,6 +147,7 @@ final _implementedRules = <String, Rule Function(Map<String, Object>)>{
   PreferCorrectIdentifierLengthRule.ruleId: PreferCorrectIdentifierLengthRule.new,
   PreferCorrectTestFileNameRule.ruleId: PreferCorrectTestFileNameRule.new,
   PreferCorrectTypeNameRule.ruleId: PreferCorrectTypeNameRule.new,
+  PreferDefineHeroTagRule.ruleId: PreferDefineHeroTagRule.new,
   PreferEnumsByNameRule.ruleId: PreferEnumsByNameRule.new,
   PreferExtractingCallbacksRule.ruleId: PreferExtractingCallbacksRule.new,
   PreferFirstRule.ruleId: PreferFirstRule.new,
@@ -160,8 +172,6 @@ final _implementedRules = <String, Rule Function(Map<String, Object>)>{
 };
 
 Iterable<String> get allRuleIds => _implementedRules.keys;
-
-Iterable<Rule> get allRules => _implementedRules.keys.map((id) => _implementedRules[id]!({}));
 
 Iterable<Rule> getRulesById(Map<String, Map<String, Object>> rulesConfig) => List.unmodifiable(_implementedRules.keys
     .where((id) => rulesConfig.keys.contains(id))

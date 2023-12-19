@@ -71,24 +71,18 @@ class LintAnalyzer {
 
   /// Returns a list of lint reports for analyzing all files in the given [folders].
   /// The analysis is configured with the [config].
-  Future<Iterable<LintFileReport>> runCliAnalysis(
-    Iterable<String> folders,
-    String rootFolder,
-    LintConfig config, {
-    String? sdkPath,
-    Set<String>? analyzedFiles,
-    List<String>? excludedPaths
-  }) async {
-    excludedPaths = excludedPaths?.map((e) => join(rootFolder,e)).toList();
-    analyzedFiles = analyzedFiles?.map((e) => join(rootFolder,e)).toSet();
+  Future<Iterable<LintFileReport>> runCliAnalysis(Iterable<String> folders, String rootFolder, LintConfig config,
+      {String? sdkPath, Set<String>? analyzedFiles, List<String>? excludedPaths}) async {
+    excludedPaths = excludedPaths?.map((e) => join(rootFolder, e)).toList();
+    analyzedFiles = analyzedFiles?.map((e) => join(rootFolder, e)).toSet();
     final collection = createAnalysisContextCollection(folders, rootFolder, sdkPath, excludedPaths: excludedPaths);
 
     final analyzerResult = <LintFileReport>[];
-    final Map<String, AnalysisContext> contextsMap = {};
+    final contextsMap = <String, AnalysisContext>{};
 
     final contexts = collection.contexts.where((element) {
       final key = element.contextRoot.optionsFile?.path;
-      if(key == null || contextsMap.containsKey(key)) return false;
+      if (key == null || contextsMap.containsKey(key)) return false;
       contextsMap[key] = element;
       return true;
     }).toList();
@@ -203,6 +197,7 @@ class LintAnalyzer {
     );
   }
 
+  // ignore: long-method
   LintFileReport? _analyzeFile(
     ResolvedUnitResult result,
     LintAnalysisConfig config,
@@ -213,7 +208,11 @@ class LintAnalyzer {
       return null;
     }
 
-    final ignores = Suppression(result.content, result.lineInfo);
+    final ignores = Suppression(
+      result.content,
+      result.lineInfo,
+      supportsTypeLintIgnore: true,
+    );
     final internalResult = InternalResolvedUnitResult(
       filePath,
       result.content,
@@ -246,10 +245,12 @@ class LintAnalyzer {
         path: filePath,
         relativePath: relativePath,
         file: fileMetrics,
-        classes: Map.unmodifiable(classMetrics.map<String, Report>((key, value) => MapEntry(key.name, value))),
-        functions: Map.unmodifiable(functionMetrics.map<String, Report>(
-          (key, value) => MapEntry(key.fullName, value),
-        )),
+        classes: Map.unmodifiable(
+          classMetrics.map((key, value) => MapEntry(key.name, value)),
+        ),
+        functions: Map.unmodifiable(
+          functionMetrics.map((key, value) => MapEntry(key.fullName, value)),
+        ),
         issues: issues,
         antiPatternCases: antiPatterns,
       );

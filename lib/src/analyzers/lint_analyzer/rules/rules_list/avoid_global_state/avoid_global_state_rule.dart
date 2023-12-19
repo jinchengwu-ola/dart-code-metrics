@@ -37,10 +37,7 @@ class AvoidGlobalStateRule extends CommonRule {
     return visitor.declarations
         .map((declaration) => createIssue(
               rule: this,
-              location: nodeLocation(
-                node: declaration,
-                source: source,
-              ),
+              location: nodeLocation(node: declaration, source: source),
               message: _warning,
             ))
         .toList(growable: false);

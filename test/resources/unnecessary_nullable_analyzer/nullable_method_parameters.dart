@@ -1,6 +1,8 @@
 // ignore_for_file: avoid-unused-parameters, no-empty-block
 
 class ClassWithMethods {
+  final inner = ClassWithMethods();
+
   void someMethod(String? value) {}
 
   // LINT
@@ -22,4 +24,8 @@ class ClassWithMethods {
 
   // ignore: unnecessary-nullable
   void ignoredAlwaysNonNullable(String? anotherValue) {}
+
+  void tearOff(String? anotherValue) {}
+
+  void anotherTearOff(String? anotherValue) {}
 }

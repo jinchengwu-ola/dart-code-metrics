@@ -49,6 +49,7 @@ class _SettersVisitor extends GeneralizingAstVisitor<void> {
           final returnVisitor = _ReturnVisitor();
           statement.visitChildren(returnVisitor);
 
+          // ignore: deprecated_member_use
           final condition = statement.condition;
           if (condition is BinaryExpression) {
             if (!(_usesParameter(condition.leftOperand) ||
@@ -97,6 +98,7 @@ class _ReturnVisitor extends RecursiveAstVisitor<void> {
 
     final type = node.expression?.staticType;
 
+    // ignore: deprecated_member_use
     if (type == null || type.isVoid) {
       _hasValidReturn = true;
     }

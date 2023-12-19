@@ -18,8 +18,8 @@ jobs:
       - name: Install dependencies
         run: dart pub get
       - name: Compile jit snapshot
-        run: dart compile jit-snapshot bin/metrics_cli.dart
+        run: dart compile jit-snapshot bin/metrics.dart
       - uses: actions/upload-artifact@v2.3.1
         with:
           name: metrics
-          path: bin/metrics_cli.jit
+          path: bin/metrics.jit

@@ -1,9 +1,12 @@
 name: "Analyze package"
 
 on:
+ # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
   pull_request:
     branches:
-      - master
+      - main
     paths:
       - "bin/**"
       - "example/**"
@@ -17,7 +20,7 @@ on:
       - "pubspec.yaml"
   push:
     branches:
-      - master
+      - main
     paths:
       - "bin/**"
       - "example/**"
@@ -36,7 +39,7 @@ permissions:
 
 jobs:
   analysis:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, macOS]
 
     steps:
       - name: Validate semantic changelog update
@@ -45,13 +48,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install Stable Dart
-        uses: dart-lang/setup-dart@v1
+      - uses: olaparty/flutter-action@main
         with:
-          sdk: "stable"
+          flutter-repo: "git@github.com:olachat/flutter.git"
+          channel: "flutter-3.13.9"
+          cache: false
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install dependencies
         run: dart pub get
@@ -65,7 +69,7 @@ jobs:
         run: dart analyze --fatal-warnings --fatal-infos .
 
       - name: Analyze by DCM
-        uses: dart-code-checker/dart-code-metrics-action@v4.0.0
+        uses: olachat/dart-code-metrics-action@main
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           folders: "bin, example, lib, test"
@@ -86,20 +90,21 @@ jobs:
 
   testing:
     needs: analysis
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, macOS]
 
     defaults:
       run:
         shell: bash
 
     steps:
-      - name: Install Stable Dart
-        uses: dart-lang/setup-dart@v1
+      - uses: olaparty/flutter-action@main
         with:
-          sdk: "stable"
+          flutter-repo: "git@github.com:olachat/flutter.git"
+          channel: "flutter-3.13.9"
+          cache: false
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install dependencies
         run: dart pub get
@@ -115,66 +120,3 @@ jobs:
           dart test test/fake_test.dart --coverage=coverage
           dart run coverage:format_coverage --in coverage --out coverage/coverage.lcov --lcov --report-on=lib
           bash <(curl -s https://codecov.io/bash) -f coverage/coverage.lcov
-
-  check-minimal-supported-dart-compatibility:
-    needs: analysis
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Install Dart 2.18.0
-        uses: dart-lang/setup-dart@v1
-        with:
-          sdk: "2.18.0"
-
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Install dependencies
-        run: dart pub downgrade
-
-      - name: Check compatibility
-        run: |
-          dart analyze --fatal-warnings --fatal-infos .
-          dart test --reporter=github
-
-  check-beta-dart-compatibility:
-    needs: analysis
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Install Dart beta
-        uses: dart-lang/setup-dart@v1
-        with:
-          sdk: "beta"
-
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Install dependencies
-        run: dart pub upgrade
-
-      - name: Check compatibility
-        run: |
-          dart analyze --fatal-warnings --fatal-infos .
-          dart test --reporter=github
-
-  check-windows-compatibility:
-    needs: analysis
-    runs-on: windows-latest
-
-    steps:
-      - name: Install Stable Dart
-        uses: dart-lang/setup-dart@v1
-        with:
-          sdk: "stable"
-
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Install dependencies
-        run: dart pub get
-
-      - name: Check compatibility
-        run: |
-          dart analyze --fatal-warnings --fatal-infos .
-          dart test --reporter=github

@@ -113,12 +113,10 @@ To hide this message pass the 'disable-sunset-warning' option.
 
   Future<void> _checkForUpdates() async {
     try {
-      final latestVersion =
-          await _pubUpdater?.getLatestVersion('dart_code_metrics');
+      final latestVersion = await _pubUpdater?.getLatestVersion('dart_code_metrics');
       final isUpToDate = packageVersion == latestVersion;
       if (!isUpToDate && latestVersion != null) {
-        final changelogLink =
-            'https://github.com/dart-code-checker/dart-code-metrics/releases/tag/$latestVersion';
+        final changelogLink = 'https://github.com/olachat/dart-code-metrics/releases/tag/$latestVersion';
         _logger.updateAvailable(packageVersion, latestVersion, changelogLink);
       }
       // ignore: avoid_catches_without_on_clauses

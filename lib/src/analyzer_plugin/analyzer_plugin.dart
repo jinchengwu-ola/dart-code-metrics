@@ -6,8 +6,6 @@ import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer_plugin/plugin/plugin.dart';
 import 'package:analyzer_plugin/protocol/protocol_generated.dart' as plugin;
-import 'package:http/http.dart';
-import 'package:uuid/uuid.dart';
 
 import '../analyzers/lint_analyzer/lint_analysis_config.dart';
 import '../analyzers/lint_analyzer/lint_analysis_options_validator.dart';
@@ -27,8 +25,7 @@ class AnalyzerPlugin extends ServerPlugin {
   AnalysisContextCollection? _contextCollection;
 
   @override
-  String get contactInfo =>
-      'https://github.com/dart-code-checker/dart-code-metrics/issues';
+  String get contactInfo => 'https://github.com/olachat/dart-code-metrics/issues';
 
   @override
   List<String> get fileGlobsToAnalyze => const ['*.dart', '*.yaml'];
@@ -41,29 +38,29 @@ class AnalyzerPlugin extends ServerPlugin {
 
   AnalyzerPlugin({
     required super.resourceProvider,
-  }) {
-    final location =
-        resourceProvider.getStateLocation('.dart-code-metrics-uuid');
-    if (location == null) {
-      return;
-    }
+  });
+  // {
+  //   final location =
+  //       resourceProvider.getStateLocation('.dart-code-metrics-uuid');
+  //   if (location == null) {
+  //     return;
+  //   }
 
-    var uuid = '';
+  //   var uuid = '';
 
-    final file = location.getChildAssumingFile('uuid');
-    if (!file.exists) {
-      uuid = const Uuid().v4();
-      file
-        ..createSource(file.toUri())
-        ..writeAsStringSync(uuid);
-    } else {
-      uuid = file.readAsStringSync();
-    }
+  //   final file = location.getChildAssumingFile('uuid');
+  //   if (!file.exists) {
+  //     uuid = const Uuid().v4();
+  //     file
+  //       ..createSource(file.toUri())
+  //       ..writeAsStringSync(uuid);
+  //   } else {
+  //     uuid = file.readAsStringSync();
+  //   }
 
-    final uri = Uri.parse('https://dcm.dev/api/analytics/usage');
-
-    post(uri, body: {'uuid': uuid, 'version': packageVersion}).ignore();
-  }
+  //   final uri = Uri.parse('https://dcm.dev/api/analytics/usage');
+  //   post(uri, body: {'uuid': uuid, 'version': packageVersion}).ignore();
+  // }
 
   @override
   Future<void> afterNewContextCollection({
@@ -73,8 +70,7 @@ class AnalyzerPlugin extends ServerPlugin {
 
     contextCollection.contexts.forEach(_createConfig);
 
-    return super
-        .afterNewContextCollection(contextCollection: contextCollection);
+    return super.afterNewContextCollection(contextCollection: contextCollection);
   }
 
   @override
@@ -96,12 +92,10 @@ class AnalyzerPlugin extends ServerPlugin {
     }
 
     try {
-      final resolvedUnit =
-          await analysisContext.currentSession.getResolvedUnit(path);
+      final resolvedUnit = await analysisContext.currentSession.getResolvedUnit(path);
 
       if (resolvedUnit is ResolvedUnitResult) {
-        final analysisErrors =
-            _getErrorsForResolvedUnit(resolvedUnit, rootPath);
+        final analysisErrors = _getErrorsForResolvedUnit(resolvedUnit, rootPath);
 
         channel.sendNotification(
           plugin.AnalysisErrorsParams(
@@ -116,8 +110,7 @@ class AnalyzerPlugin extends ServerPlugin {
       }
     } on Exception catch (e, stackTrace) {
       channel.sendNotification(
-        plugin.PluginErrorParams(false, e.toString(), stackTrace.toString())
-            .toNotification(),
+        plugin.PluginErrorParams(false, e.toString(), stackTrace.toString()).toNotification(),
       );
     }
   }
@@ -129,8 +122,7 @@ class AnalyzerPlugin extends ServerPlugin {
     try {
       final path = parameters.file;
       final analysisContext = _contextCollection?.contextFor(path);
-      final resolvedUnit =
-          await analysisContext?.currentSession.getResolvedUnit(path);
+      final resolvedUnit = await analysisContext?.currentSession.getResolvedUnit(path);
 
       if (analysisContext != null && resolvedUnit is ResolvedUnitResult) {
         final analysisErrors = _getErrorsForResolvedUnit(
@@ -149,8 +141,7 @@ class AnalyzerPlugin extends ServerPlugin {
       }
     } on Exception catch (e, stackTrace) {
       channel.sendNotification(
-        plugin.PluginErrorParams(false, e.toString(), stackTrace.toString())
-            .toNotification(),
+        plugin.PluginErrorParams(false, e.toString(), stackTrace.toString()).toNotification(),
       );
     }
 
@@ -165,8 +156,7 @@ class AnalyzerPlugin extends ServerPlugin {
     final config = _configs[rootPath];
 
     if (config != null) {
-      final report =
-          _analyzer.runPluginAnalysis(analysisResult, config, rootPath);
+      final report = _analyzer.runPluginAnalysis(analysisResult, config, rootPath);
 
       if (report != null) {
         result.addAll([
@@ -197,8 +187,8 @@ class AnalyzerPlugin extends ServerPlugin {
     final file = analysisContext.contextRoot.optionsFile;
 
     if (file != null && file.exists) {
-      final analysisOptions = analysisOptionsFromContext(analysisContext) ??
-          analysisOptionsFromFilePath(file.parent.path, analysisContext);
+      final analysisOptions =
+          analysisOptionsFromContext(analysisContext) ?? analysisOptionsFromFilePath(file.parent.path, analysisContext);
       final config = ConfigBuilder.getLintConfigFromOptions(analysisOptions);
 
       final lintConfig = ConfigBuilder.getLintAnalysisConfig(
@@ -224,8 +214,7 @@ class AnalyzerPlugin extends ServerPlugin {
 
     final result = <plugin.AnalysisErrorFixes>[];
 
-    final report =
-        LintAnalysisOptionsValidator.validateOptions(config, rootPath);
+    final report = LintAnalysisOptionsValidator.validateOptions(config, rootPath);
     if (report != null) {
       result.addAll(report.issues.map(
         (issue) => codeIssueToAnalysisErrorFixes(issue, null),

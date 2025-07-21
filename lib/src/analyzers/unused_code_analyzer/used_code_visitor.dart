@@ -97,6 +97,82 @@ class UsedCodeVisitor extends RecursiveAstVisitor<void> {
     _visitIdentifier(node, node.staticElement);
   }
 
+  @override
+  void visitNamedType(NamedType node) {
+    // Track type usage when it's actually being used (not just referenced)
+    final element = node.element;
+    if (element != null) {
+      final parent = node.parent;
+
+      // Special handling: don't count usage in State<Widget> pattern
+      if (parent is TypeArgumentList) {
+        final typeArgListParent = parent.parent;
+        if (typeArgListParent is NamedType && isWidgetStateOrSubclass(typeArgListParent.type)) {
+          // Skip tracking widget types used in State<WidgetType>
+          super.visitNamedType(node);
+          return;
+        }
+      }
+
+      // Track types used in extends, implements, with clauses
+      if (parent is ExtendsClause || parent is ImplementsClause || parent is WithClause) {
+        _recordUsedElement(element);
+      }
+      // Track types used in constructor calls
+      else if (parent is ConstructorName) {
+        _recordUsedElement(element);
+      }
+      // Track types used as type arguments (e.g., List<MyType>)
+      else if (parent is TypeArgumentList) {
+        _recordUsedElement(element);
+      }
+      // Track types used in function/method parameters and return types
+      else if (parent is SimpleFormalParameter ||
+          parent is FunctionTypedFormalParameter ||
+          parent is FieldFormalParameter) {
+        _recordUsedElement(element);
+      }
+      // Track types used as return types
+      else if (parent is MethodDeclaration || parent is FunctionDeclaration) {
+        _recordUsedElement(element);
+      }
+      // Track types used in variable declarations
+      else if (parent is VariableDeclarationList) {
+        _recordUsedElement(element);
+      }
+    }
+
+    super.visitNamedType(node);
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    // Track extension method usage
+    final element = node.methodName.staticElement;
+    if (element != null) {
+      final enclosingElement = element.enclosingElement3;
+      if (enclosingElement is ExtensionElement) {
+        _recordUsedElement(enclosingElement);
+      }
+    }
+
+    super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitPropertyAccess(PropertyAccess node) {
+    // Track extension property usage
+    final element = node.propertyName.staticElement;
+    if (element != null) {
+      final enclosingElement = element.enclosingElement3;
+      if (enclosingElement is ExtensionElement) {
+        _recordUsedElement(enclosingElement);
+      }
+    }
+
+    super.visitPropertyAccess(node);
+  }
+
   void _recordAssignmentTarget(
     CompoundAssignmentExpression node,
     Expression target,
@@ -115,15 +191,28 @@ class UsedCodeVisitor extends RecursiveAstVisitor<void> {
 
   void _recordIfExtensionMember(Element? element) {
     if (element != null) {
-      // For now, skip extension member recording to avoid API issues
-      // This may need to be updated when the proper modern API is identified
+      // Record the extension that contains this member
+      // We need to find the extension through the element's library
+      // Since enclosingElement is deprecated in analyzer 7.5.9
+      // For now, we'll skip this to maintain compatibility
       return;
     }
   }
 
   bool _recordConditionalElement(Element element) {
-    // Skip conditional element recording for now due to API changes
-    // This may need to be updated when the proper modern API is identified
+    final elementSource = element.source?.fullName;
+    if (elementSource == null) {
+      return false;
+    }
+
+    // Check if this element is from a conditionally imported file
+    for (final entry in fileElementsUsage.conditionalElements.entries) {
+      if (entry.key.contains(elementSource)) {
+        entry.value.add(element);
+        return true;
+      }
+    }
+
     return false;
   }
 

@@ -74,6 +74,11 @@ void main() {
           final report = result.firstWhere(
             (report) => report.path.endsWith('conditional_file.dart'),
           );
+          // print all issues
+          for (final issue in report.issues) {
+            print(
+                '${issue.declarationName} - ${issue.declarationType} - ${issue.location.line} - ${issue.location.column}');
+          }
 
           expect(report.issues, hasLength(1));
 
@@ -109,6 +114,8 @@ void main() {
           final report = result.firstWhere(
             (report) => report.path.endsWith('public_members.dart'),
           );
+
+
 
           expect(report.issues, hasLength(8));
 

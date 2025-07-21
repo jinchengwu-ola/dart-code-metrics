@@ -175,10 +175,13 @@ class UnusedCodeAnalyzer {
       final relativePath = relative(path, from: rootFolder);
 
       if (issues.isNotEmpty) {
+        // Sort issues by line number to ensure consistent ordering
+        final sortedIssues = issues..sort((a, b) => a.location.line.compareTo(b.location.line));
+
         unusedCodeReports.add(UnusedCodeFileReport(
           path: path,
           relativePath: relativePath,
-          issues: issues,
+          issues: sortedIssues,
         ));
       }
     });

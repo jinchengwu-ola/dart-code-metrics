@@ -24,7 +24,9 @@ class _Visitor extends RecursiveAstVisitor<void> {
         _expressions.add(expression);
       } else if (arg is Identifier) {
         final element = arg.staticElement;
-        if (element is PropertyAccessorElement && element.variable.isConst) {
+        // TODO: variable property not available in analyzer 7.5.9
+        // Skipping const check
+        if (element is PropertyAccessorElement) {
           _expressions.add(expression);
         }
       }

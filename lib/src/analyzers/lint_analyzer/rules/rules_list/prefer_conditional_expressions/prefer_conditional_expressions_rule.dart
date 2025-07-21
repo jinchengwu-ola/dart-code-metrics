@@ -74,7 +74,9 @@ class PreferConditionalExpressionsRule extends CommonRule {
     final elseStatement = info.unwrappedElseStatement;
 
     // ignore: deprecated_member_use
-    final condition = info.statement.condition;
+    // TODO: condition property not available in analyzer 7.5.9
+    // final condition = info.statement.condition;
+    final condition = info.statement.expression;
 
     if (thenStatement is AssignmentExpression &&
         elseStatement is AssignmentExpression) {

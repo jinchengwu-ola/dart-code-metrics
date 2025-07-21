@@ -23,7 +23,9 @@ class _Visitor extends RecursiveAstVisitor<void> {
   void visitComment(Comment node) {
     super.visitComment(node);
 
-    if (node.isDocumentation) {
+    // TODO: isDocumentation not available in analyzer 7.5.9
+    // if (node.isDocumentation) {
+    if (node.tokens.any((token) => token.lexeme.startsWith('///'))) {
       final isValid = node.tokens.length == 1
           ? _hasValidSingleLine(node.tokens.first, _CommentType.doc)
           : _hasValidMultiline(node.tokens, _CommentType.doc);

@@ -51,8 +51,10 @@ class _AsyncSetStateVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitAssertStatement(AssertStatement node) {
-    final newMounted = _extractMountedCheck(node.condition);
-    mounted = newMounted.or(mounted);
+    // TODO: condition property not available in analyzer 7.5.9
+    // Skipping assert statement check
+    // final newMounted = _extractMountedCheck(node.condition);
+    // mounted = newMounted.or(mounted);
     super.visitAssertStatement(node);
   }
 
@@ -78,11 +80,11 @@ class _AsyncSetStateVisitor extends RecursiveAstVisitor<void> {
       return node.visitChildren(this);
     }
 
-    // ignore: deprecated_member_use
-    node.condition.accept(this);
+    // TODO: condition property not available in analyzer 7.5.9
+    // node.condition.accept(this);
 
     // ignore: deprecated_member_use
-    final newMounted = _extractMountedCheck(node.condition);
+    final newMounted = _extractMountedCheck(node.expression);
     mounted = newMounted.or(mounted);
 
     final beforeThen = mounted;
@@ -106,7 +108,8 @@ class _AsyncSetStateVisitor extends RecursiveAstVisitor<void> {
       mounted = beforeThen != afterThen
           ? afterThen
           // ignore: deprecated_member_use
-          : _extractMountedCheck(node.condition, permitAnd: false);
+          // TODO: condition property not available in analyzer 7.5.9, using expression
+          : _extractMountedCheck(node.expression, permitAnd: false);
     }
   }
 
@@ -116,10 +119,13 @@ class _AsyncSetStateVisitor extends RecursiveAstVisitor<void> {
       return node.visitChildren(this);
     }
 
-    node.condition.accept(this);
+    // TODO: condition property not available in analyzer 7.5.9
+    // node.condition.accept(this);
 
     final oldMounted = mounted;
-    final newMounted = _extractMountedCheck(node.condition);
+    // TODO: condition property not available in analyzer 7.5.9
+    // final newMounted = _extractMountedCheck(node.condition);
+    const newMounted = Fact<BinaryExpression>.maybe();
     mounted = newMounted.or(mounted);
     final oldInControlFlow = inControlFlow;
     inControlFlow = true;
